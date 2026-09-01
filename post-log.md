@@ -22,7 +22,32 @@ One entry per weekly run. Newest first. Used to decide format rotation
   opaque blob.
 - **Format:** Crisp Take (weekly default; first run, no post history yet
   to indicate otherwise).
-- **Status:** drafted
+- **Draft:**
+  > Anthropic, OpenAI, and Google encrypt their models' hidden reasoning
+  > with one key per provider. Not per session, per user, or per model
+  > tier.
+  >
+  > Researchers from the ELLIS Institute, Max Planck, and Snyk found you
+  > can take an encrypted reasoning block from a guarded frontier model,
+  > replay it into a cheap sibling model, and ask that weaker model to
+  > transcribe it. No jailbreak needed. They scraped 6,708 public agent
+  > trajectories off GitHub and Hugging Face, decoded 315,320 blocks, and
+  > pulled 182 live credentials out of logs people had already published.
+  >
+  > The trace was never sold as a security boundary. But every team
+  > logging agent runs for debugging treated "encrypted" as "safe to
+  > keep." Anthropic's own read, via its bug bounty program, was that
+  > this had no security implications.
+  >
+  > If your framework snapshots reasoning into a trajectory log and that
+  > log lands in a public repo, you're not publishing a blob. You're
+  > publishing whatever the model was thinking that turn.
+  >
+  > What's sitting in your debug logs right now?
+- **Image idea:** Bold text card, black bg / white text — "One key. Every
+  reasoning trace. Every provider." with a smaller line underneath.
+- **Status:** drafted (backfilled with full text after the fact — this
+  run predates the "save full draft text" rule)
 - **Citations:**
   - https://arxiv.org/abs/2608.09867 (paper: "Stealing Reasoning Traces
     from Proprietary LLM APIs", submitted 2026-08-10)

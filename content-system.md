@@ -2,7 +2,10 @@
 
 Niche: practical LLM engineering — "the engineer who tests things, breaks
 things, and translates what it means for people who build." Not a news
-aggregator. Cadence: 1 post/week.
+aggregator. Cadence: 1 post/week gets published — but each weekly run
+produces a slate of options (see "Weekly output," below) rather than a
+single take-it-or-leave-it draft, so there's real choice, and unused
+drafts roll forward as a backlog instead of being wasted.
 
 Voice: Karpathy precision + Hamel bluntness. Specific, direct, dry when
 something's absurd. The observation carries the weight, not personality —
@@ -16,6 +19,9 @@ keep personality-on-display low.
 - Start sentences with "And" or "But" sometimes
 - Add one detail only the author would know, if given
 - Read it as if reading aloud before finalizing
+- Let a genuinely absurd or funny detail land as funny — dry, deadpan,
+  stated plainly. This is not the same as forcing a joke; if nothing in
+  the material is actually funny, don't manufacture one.
 
 ## Never do
 - "In today's rapidly evolving landscape..."
@@ -84,17 +90,42 @@ confirmed, soften it or drop it. See the Opus 4.1→4.8 mixup from
 draft claimed Opus 4.1 users were redirected to Opus 5 on deprecation; the
 real migration target was Opus 4.8, an unrelated model.
 
-## Output per run
+## Weekly output — multiple stories, multiple drafts
 
-For each weekly run, produce:
+Each run should surface real choice, not one draft to accept or reject.
+
+1. **Shortlist 4-6 candidates** that clear the post-worthy filter, from
+   different sources where possible (don't let all of them be the same
+   story from different outlets).
+2. **Fully draft 3 of the strongest candidates** as complete posts, each
+   in whichever format actually fits that story best (don't force all 3
+   into Crisp Take — use the rotation logic to lean toward whatever
+   `post-log.md` is short on).
+3. **For at least one of the 3**, also write a second, lighter/funnier
+   version of the same story — usually a Meme + Dry Take treatment of the
+   same underlying fact, sitting alongside the straighter version. This is
+   an alternate take on the same story, not a different story. Only do
+   this where the material genuinely supports it — see the "let it land"
+   rule above.
+4. Log the remaining shortlisted-but-undrafted candidates too (as
+   `status: bank`, WHAT only, no draft) so they're not lost — next week's
+   run should check these before searching from scratch, and skip any that
+   have gone stale (a week-old capability claim, a since-resolved story).
+
+For every drafted post, record in `post-log.md`:
 1. WHAT — one line, what happened, with source URL
 2. TAKE — one line, what you actually think
 3. Format used, and why (per rotation logic above)
-4. The full drafted post text
+4. **The full drafted post text, verbatim** — this is the actual
+   deliverable; don't just summarize it in the log
 5. An image idea (one line — bold text card / meme template / annotated
    screenshot / side-by-side / digest card, per the doc's image system)
 6. Citation URL(s) for any stat used
+7. Status: `drafted` for the 3 full drafts (and the alt version, if
+   written), `bank` for shortlisted-but-undrafted candidates
 
-Then append the entry to `post-log.md` with status `drafted`, and message
-the user the finished draft for review — never post it. Publishing is
-always manual: the user copies the approved text into LinkedIn themselves.
+Then message the user all 3 drafts (plus any alt version) together, each
+clearly labeled, so they can pick which one to actually post this week.
+Never post anything — publishing is always manual, the user copies the
+chosen text into LinkedIn themselves. Drafts not chosen stay in
+`post-log.md` as usable backlog, not wasted work.
