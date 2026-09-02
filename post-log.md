@@ -3,6 +3,197 @@
 One entry per weekly run. Newest first. Used to decide format rotation
 (see `content-system.md`) and to avoid repeating a topic.
 
+## 2026-09-02 — Weekly run (2x Crisp Take, Micro Story + Meme alt)
+
+### 1. Claude Fable 5.1's real change is the cache-read price, not the spec sheet — Crisp Take
+- **WHAT:** Anthropic released Claude Fable 5.1 and a restricted-access Claude Mythos
+  5.1 on 2026-09-01, priced identically to Fable 5 ($10/MTok input, $50/MTok output)
+  except for cache reads, cut 75% to $0.25/MTok (down from $1.00/MTok) — Anthropic
+  states this cuts real-world cost by roughly 25% for typical workloads and up to
+  ~45% for heavily agentic ones. The 1M-token context window is now the default and
+  the maximum, at standard per-token pricing across the whole window (128k max
+  output). Two breaking API changes ship alongside it: forced tool use
+  (`tool_choice: "any"`/named tool) now returns a 400 error because thinking is
+  always on and a forced call would skip the reasoning step, and Fable 5.1 thinking
+  blocks are only readable going forward — an earlier model can't read a Fable 5.1
+  thinking block, so switching models mid-conversation silently drops that
+  reasoning unless the caller opts into visibility.
+- **TAKE:** The pricing story headlines as "cheaper," but the part worth an
+  engineer's attention is buried in the migration notes — two API contract changes
+  that will silently break existing forced-tool-use code and quietly drop reasoning
+  on model fallback unless someone reads the docs page instead of the announcement.
+- **Format:** Crisp Take (weekly default; specific claim + non-obvious layer + take
+  fits cleanly, and Anthropic's own docs give a clean primary-source citation).
+- **Draft:**
+  > Anthropic shipped Claude Fable 5.1 on September 1st at the same $10/$50
+  > per-million-token price as Fable 5. The one number that moved: cache reads, cut
+  > 75% to $0.25 per million.
+  >
+  > Not a headline feature — the whole story for long agentic sessions. Anthropic
+  > says real savings land around 25% for typical workloads, up to 45% for heavily
+  > agentic ones, because those runs keep re-reading the same cached prefix turn
+  > after turn.
+  >
+  > The catch is buried in the migration notes: thinking is now always on, so forced
+  > tool use returns a flat 400 error instead — a forced call would skip the
+  > reasoning step. And a Fable 5.1 thinking block only reads forward: swap to an
+  > older model mid-conversation and that reasoning silently disappears.
+  >
+  > Cache savings ship as a headline. API-contract changes ship in a docs page most
+  > people skim.
+  >
+  > Anyone re-running their evals yet, or waiting to see who hits the breaking
+  > changes first?
+- **Image idea:** Bold text card, black bg / white text — "$1.00 → $0.25 per
+  million cache reads." with "Same input/output price. Two breaking changes free."
+  underneath.
+- **Status:** drafted
+- **Citations:**
+  - https://platform.claude.com/docs/en/models/fable-5-1/whats-new-fable-5-1
+  - https://venturebeat.com/technology/anthropics-claude-fable-5-1-and-mythos-5-1-arrive-with-a-75-cost-reduction-for-fable-cache-reads
+  - https://www.implicator.ai/anthropic-fable-5-1-same-price-cache-reads-cut/
+
+### 2. OpenAI's Astra reportedly trades chain-of-thought visibility for cheaper reasoning — Micro Story
+- **WHAT:** Reporting from The Information (via Techmeme, 2026-09-01) says OpenAI's
+  unreleased Astra model uses "recurrent depth" — looping the model's hidden state
+  through the same transformer layers multiple times instead of adding more layers,
+  letting it do extra reasoning in latent space rather than writing it out as
+  chain-of-thought tokens. The reported benefit is lower memory/KV-cache cost per
+  unit of effective reasoning depth. The reported cost: reasoning done this way
+  never becomes inspectable text, undermining chain-of-thought monitoring as a
+  safety tool. OpenAI is reportedly limiting how much Astra actually uses the
+  technique because of that concern. This is a distinct fact from last week's Astra
+  item (OpenAI pausing development over a Preparedness Framework cyberattack
+  threshold) — same model, different mechanism and different week's reporting.
+- **TAKE:** An architecture change picked purely for cost/speed can quietly remove
+  the one channel (readable reasoning traces) that safety and debugging tooling
+  both lean on — and that's a cost worth pricing in before adopting a similar trick,
+  not after.
+- **Format:** Micro Story (log was short on this format relative to target cadence;
+  tried/expected/actual/new-rule/dry-closer arc fits a reported architecture
+  decision's outcome, framed as OpenAI's attempt rather than the account's own, same
+  pattern used for the KV-cache-compaction paper in the 2026-09-01 run).
+- **Draft:**
+  > OpenAI reportedly built Astra on a technique called recurrent depth: instead of
+  > stacking more transformer layers, the model loops its hidden state through the
+  > same layers multiple times, doing extra reasoning in latent space instead of
+  > writing it out as chain-of-thought tokens.
+  >
+  > The expected win was efficiency — more effective reasoning depth without growing
+  > the KV cache or the token bill for every extra reasoning step, and without
+  > adding actual parameters.
+  >
+  > What actually happened, according to reporting from The Information: the same
+  > trick that saves memory also erases the readable trail chain-of-thought
+  > monitoring depends on. If the reasoning never becomes text, there's nothing to
+  > inspect — not a jailbreak, not a capability threshold, just reasoning that
+  > stopped being legible by design. OpenAI is reportedly limiting how much of Astra
+  > actually uses the technique, specifically because of that.
+  >
+  > New rule if you're evaluating an architecture change for cost or speed: run it
+  > past whatever you use for debugging and oversight before you ship it, not after.
+  > A win on the benchmark and a loss on the thing that lets you see what the model
+  > is doing are not offsetting, even when nothing else about the model's
+  > capabilities changed.
+  >
+  > Cheaper reasoning that nobody can read is still reasoning nobody can read.
+- **Image idea:** Annotated diagram — stacked-layers model vs. looped-layer
+  (recurrent depth) model, with a callout on the loop showing "no token trail."
+- **Status:** drafted
+- **Citations:**
+  - https://www.techmeme.com/260901/p61
+  - https://www.geeky-gadgets.com/openai-chatgpt-6-astra-model-rumors/
+  - https://www.securityweek.com/openais-upcoming-astra-model-raises-autonomous-cyberattack-concerns/
+
+### 3. DeepSeek Harness broke the fastest GitHub star record, then broke its own plugins — Crisp Take
+- **WHAT:** DeepSeek Harness (an MIT-licensed, Node.js agent runtime built around an
+  "everything is a plugin" architecture — models, tools, skills, sessions,
+  sandboxes, and UI all implemented as plugins on the Cordis framework) reached
+  20,000 GitHub stars in roughly 90 minutes after its 2026-08-13 release, breaking
+  the prior fastest-to-20k record (xAI's Grok-1, ~1.2 days). As of this run the repo
+  shows 209,000+ stars and 24,400+ forks. The README carries an explicit warning —
+  "developer preview... THERE WILL BE COMPATIBILITY-BREAKING CHANGES" — and made
+  good on it: the v0.1.2-alpha.1 release rewrote foundational plugin contracts,
+  breaking plugins that called the now-removed APIProxy, plugins with custom
+  SessionEvent types (conversations failed to restore), and UI plugins (target DOM
+  elements were removed).
+- **TAKE:** A record-breaking star count measures how many people got excited in a
+  weekend, not whether the thing they starred still works after the next release —
+  worth remembering before treating GitHub star velocity as a signal of anything
+  other than launch-day hype.
+- **Format:** Crisp Take (specific claim + non-obvious layer + take fits directly;
+  paired with a Meme alt below since the material — a plugin-architecture project
+  breaking its own plugin ecosystem in its first point release — is genuinely
+  funny, not forced).
+- **Draft:**
+  > DeepSeek Harness hit 20,000 GitHub stars in about ninety minutes on August 13th,
+  > beating Grok-1's prior record of roughly 1.2 days to the same mark. Past 209,000
+  > stars and 24,400 forks now. MIT licensed, "everything is a plugin": models,
+  > tools, skills, sessions, sandboxes, even the UI are all swappable.
+  >
+  > The README says, in bold, why not to build on it yet: "developer preview...
+  > THERE WILL BE COMPATIBILITY-BREAKING CHANGES." It wasn't kidding. The
+  > v0.1.2-alpha.1 release rewrote foundational plugin contracts — plugins calling
+  > the removed APIProxy crashed on load, plugins with custom SessionEvent types
+  > couldn't restore conversations, UI plugins vanished when their target DOM
+  > elements disappeared.
+  >
+  > Star count measures excitement. It doesn't measure whether the plugin you
+  > installed yesterday still works today.
+  >
+  > If "everything is a plugin" is the pitch, the real question isn't how fast it
+  > grew. It's how many of those 209,000 stargazers are still on the same version
+  > next month.
+- **Image idea:** Digest/side-by-side card — "20,000 stars / 90 minutes" next to
+  "v0.1.2-alpha.1 / broke the plugin ecosystem."
+- **Status:** drafted
+- **Citations:**
+  - https://github.com/deepseek-ai/deepseek-harness
+  - https://venturebeat.com/technology/deepseek-harness-launches-as-open-source-rival-to-claude-code-alongside-v4-pro-on-api-with-higher-prices
+  - https://pasqualepillitteri.it/en/news/11573/deepseek-harness-fastest-github-stars-record
+  - https://www.remio.ai/post/deepseek-harness-tested-its-plugin-bet-comes-with-preview-risks
+
+### 3a. Same story, alt version — Meme + Dry Take
+- **WHAT:** Same as above.
+- **TAKE:** Same underlying fact, played for the joke — an "everything is a plugin"
+  project breaking its own plugins on the first point release is inherently
+  meme-shaped, no exaggeration needed.
+- **Format:** Meme + Dry Take (alt version of story #3, per weekly output rule
+  requiring at least one lighter treatment where the material supports it).
+- **Draft:**
+  > [Building the plane mid-flight meme]
+  >
+  > DeepSeek Harness: fastest GitHub star record in history — 20K stars in 90
+  > minutes, past 209K and counting.
+  >
+  > Architecture: everything is a plugin.
+  >
+  > First point release: broke everyone's plugins.
+  >
+  > Building in public, literally.
+- **Image idea:** Meme template (building/repairing the plane mid-flight), no
+  caption overlay needed beyond the lines above.
+- **Status:** drafted
+- **Citations:** same as story #3.
+
+### Bank — shortlisted, not drafted this run
+- NVIDIA published an official "verified" agent skills repository
+  (github.com/NVIDIA/skills) built on the open agentskills.io spec, installable
+  into Claude Code, Codex, and Cursor via `npx skills add nvidia/skills`. Framed
+  around capability governance/security for agent skills, not just a skill catalog.
+  Worth a closer look at what "verified" actually checks before drafting a take on
+  it.
+  (https://github.com/NVIDIA/skills ,
+  https://developer.nvidia.com/blog/nvidia-verified-agent-skills-provide-capability-governance-for-ai-agents/)
+  — **Status:** bank
+- Claude Code's "auto mode" became the default for new sessions on Pro, Max, and
+  Team plans starting 2026-08-14; Anthropic's own controlled test (1,053 paid
+  testers) found human review caught 13.6% of dangerous commands vs. 89% for the
+  auto-mode classifier. Carried over from the 2026-09-01 run, still undrafted, still
+  current — no new information changes this one.
+  (https://techcrunch.com/2026/08/09/anthropic-is-turning-claude-codes-auto-mode-on-by-default/)
+  — **Status:** bank
+
 ## 2026-09-01 — Weekly run (Crisp Take, Micro Story, Trend Connect + Meme alt)
 
 ### 1. Claude Code's "25% increase" is a 17% cut — Crisp Take
